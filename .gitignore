@@ -1,0 +1,20 @@
+# Terraform
+**/.terraform/*
+*.tfstate
+*.tfstate.*
+*.tfvars
+*.tfplan
+crash.log
+crash.*.log
+
+# Secrets et identifiants
+.env
+.env.*
+*.pem
+*.key
+secrets/
+
+# Système et éditeurs
+.DS_Store
+.vscode/
+.idea/

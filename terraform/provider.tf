@@ -1,4 +1,3 @@
 provider "aws" {
-  region  = "eu-north-1"
-  profile = "terraform-lab"
+  region = "eu-north-1" # region fixe 
 }

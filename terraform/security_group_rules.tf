@@ -1,8 +1,10 @@
+# Règles des groupes de sécurité définis dans security_groups.tf
+
 /*------------------
 REGLES ENTRANTES (INGRESS)
 ------------------*/
 
-# EC2 : autoriser SSH depuis mon adresse IP
+# EC2 : SSH uniquement depuis l'adresse IP de l'administrateur
 resource "aws_vpc_security_group_ingress_rule" "ec2_ssh" {
   security_group_id = aws_security_group.ec2.id
   description       = "SSH access"
@@ -13,7 +15,7 @@ resource "aws_vpc_security_group_ingress_rule" "ec2_ssh" {
   cidr_ipv4   = "80.215.105.135/32"
 }
 
-# EC2 : autoriser PostgREST depuis mon adresse IP
+# EC2 : API PostgREST accessible depuis tout Internet
 resource "aws_vpc_security_group_ingress_rule" "ec2_postgrest" {
   security_group_id = aws_security_group.ec2.id
   description       = "PostgREST API access"
@@ -21,10 +23,10 @@ resource "aws_vpc_security_group_ingress_rule" "ec2_postgrest" {
   ip_protocol = "tcp"
   from_port   = 3000
   to_port     = 3000
-  cidr_ipv4   = "0.0.0.0/0"
+  cidr_ipv4   = "0.0.0.0/0" # 0.0.0.0/0 = toutes les adresses IPv4
 }
 
-# RDS : autoriser PostgreSQL depuis le groupe de sécurité EC2
+# RDS : PostgreSQL accessible uniquement depuis les instances qui portent le groupe de sécurité EC2
 resource "aws_vpc_security_group_ingress_rule" "rds_postgres" {
   security_group_id            = aws_security_group.rds.id
   referenced_security_group_id = aws_security_group.ec2.id # Permet d'autoriser un autre groupe de sécurité plutôt qu'une adresse IP.
@@ -43,14 +45,14 @@ REGLES SORTANTES (EGRESS)
 resource "aws_vpc_security_group_egress_rule" "ec2_all" {
   security_group_id = aws_security_group.ec2.id
 
-  ip_protocol = "-1" # -1 signifie tous les protocoles
+  ip_protocol = "-1" # -1 = tous les protocoles et tous les ports
   cidr_ipv4   = "0.0.0.0/0"
 }
 
-# RDS : autoriser toutes les sorties
+# RDS : toutes les sorties autorisées (règle par défaut créée par AWS).
 resource "aws_vpc_security_group_egress_rule" "rds_all" {
   security_group_id = aws_security_group.rds.id
 
-  ip_protocol = "-1" # -1 signifie tous les protocoles
+  ip_protocol = "-1"
   cidr_ipv4   = "0.0.0.0/0"
 }
